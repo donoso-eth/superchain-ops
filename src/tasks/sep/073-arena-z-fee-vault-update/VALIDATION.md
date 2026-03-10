@@ -94,31 +94,6 @@ If signer is on Security Council Safe: `0xf64bc17485f0B4Ea5F06A96514182FC4cB5619
     - `res=$(cast index address 0xf64bc17485f0B4Ea5F06A96514182FC4cB561977 8)`
     - `cast index bytes32 0xd6c04a5a37d6e8024bf6bdab9c3b4dc365168b954de287f1ebcd940b9bdff24d $res`
 
-### [`0x90fdce6efff020605462150cde42257193d1e558`](https://github.com/ethereum-optimism/superchain-registry/blob/main/superchain/configs/sepolia/arena-z.toml) (OptimismPortalProxy) - Chain ID: 9899
-
-- **Key:**          `0x0000000000000000000000000000000000000000000000000000000000000001`
-  - **Decoded Kind:** [`struct ResourceMetering.ResourceParams`](https://github.com/ethereum-optimism/optimism/blob/e84868c27776fd04dc77e95176d55c8f6b1cc9a3/packages/contracts-bedrock/src/L1/ResourceMetering.sol#L25-L29)
-  - **Before:** Current resource metering params (block-dependent).
-  - **After:** Updated resource metering params (block-dependent).
-  - **Summary:** Resource metering params updated due to 5 deposit transactions.
-  - **Detail:** The [`params`](https://github.com/ethereum-optimism/optimism/blob/e84868c27776fd04dc77e95176d55c8f6b1cc9a3/packages/contracts-bedrock/src/L1/ResourceMetering.sol#L59) struct at storage slot 1 is a packed struct of three fields:
-    - `prevBaseFee` (uint128, bytes 0-15): EIP-1559 base fee for deposits. Should remain at the minimum of 1 gwei (`0x3b9aca00`) since Sepolia deposit demand is low.
-    - `prevBoughtGas` (uint64, bytes 16-23): Total gas bought in the current block. Should be `0x2B7CD0` (2,850,000), which is the sum of gas limits from the 5 [`depositTransaction`](https://github.com/ethereum-optimism/optimism/blob/e84868c27776fd04dc77e95176d55c8f6b1cc9a3/packages/contracts-bedrock/src/L1/OptimismPortal2.sol#L454) calls: 2 × `DEPLOY_GAS_LIMIT` (1,200,000) + 3 × `UPGRADE_GAS_LIMIT` (150,000).
-    - `prevBlockNum` (uint64, bytes 24-31): Block number at execution time (dynamic, cannot be verified in advance).
-
-    The packed slot layout is:
-    ```
-    0x<prevBlockNum 8 bytes><prevBoughtGas 8 bytes><prevBaseFee 16 bytes>
-    0x<block_num.......>00000000002b7cd00000000000000000000000003b9aca00
-    ```
-
-    The `prevBoughtGas` is reset to 0 at the start of a new block (via the [`metered`](https://github.com/ethereum-optimism/optimism/blob/e84868c27776fd04dc77e95176d55c8f6b1cc9a3/packages/contracts-bedrock/src/L1/ResourceMetering.sol#L88-L126) modifier), then each `depositTransaction` call accumulates its gas limit. Since all 5 calls happen in the same transaction (same block), the final value is exactly the sum of the 5 gas limits.
-
-    You can verify the current on-chain value with:
-    ```bash
-    cast storage 0x90fdce6efff020605462150cde42257193d1e558 1 --rpc-url https://ethereum-sepolia-rpc.publicnode.com
-    ```
-
 > [!IMPORTANT]
 > Security Council Only
 
